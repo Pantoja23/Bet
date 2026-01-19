@@ -5,176 +5,166 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <style>
-    :root { 
-      --neon: #00f2ff; 
-      --bg-overlay: rgba(0, 0, 0, 0.82); 
-      --card-bg: rgba(20, 20, 25, 0.95);
-    }
-
+    :root { --neon: #00f2ff; --gold: #ffd700; --bg-dark: rgba(0, 0, 0, 0.85); --card-bg: rgba(20, 20, 25, 0.98); }
     body { 
-      font-family: 'Arial Black', sans-serif; 
-      background: #000;
-      /* FONDO ESTADIO NOCTURNO REAL */
-      background-image: linear-gradient(var(--bg-overlay), var(--bg-overlay)), 
-                        url('https://images.pexels.com/photos/399187/pexels-photo-399187.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2');
-      background-attachment: fixed;
-      background-size: cover;
-      background-position: center;
-      color: #fff; 
-      margin: 0; 
+      font-family: 'Arial Black', sans-serif; background: #000;
+      background-image: linear-gradient(var(--bg-dark), var(--bg-dark)), url('https://images.pexels.com/photos/399187/pexels-photo-399187.jpeg?auto=compress&cs=tinysrgb&w=800');
+      background-attachment: fixed; background-size: cover; color: #fff; margin: 0; -webkit-tap-highlight-color: transparent;
     }
-
-    /* LOGIN CON ESTADIO DIFUMINADO */
-    #login_screen {
-      background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.9)), 
-                        url('https://images.pexels.com/photos/46798/the-ball-stadion-football-the-pitch-46798.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2');
-      background-size: cover;
-      background-position: center;
-      height: 100vh;
-      display: flex; flex-direction: column; justify-content: center; align-items: center;
-      position: fixed; width: 100%; top: 0; z-index: 1000;
-    }
-
-    .header { 
-      background: rgba(0, 0, 0, 0.9);
-      padding: 25px 15px; text-align: center;
-      border-bottom: 3px solid var(--neon);
-      box-shadow: 0 5px 25px rgba(0, 242, 255, 0.6);
-      position: sticky; top: 0; z-index: 100;
-    }
-
-    #admin_box { 
-      background: rgba(255, 215, 0, 0.1); 
-      border: 2px dashed gold; padding: 15px; margin: 20px;
-      border-radius: 15px; display: none; text-align: center;
-    }
-
-    .game-card { 
-      background: var(--card-bg); 
-      padding: 20px; margin: 20px 15px; 
-      border-radius: 20px; border: 1px solid var(--neon);
-      box-shadow: 0 10px 40px rgba(0,0,0,0.9);
-      backdrop-filter: blur(10px);
-    }
-
-    .teams { 
-      display: flex; justify-content: space-between; align-items: center; 
-      font-size: 1.3em; font-weight: 900;
-    }
-
-    .btn-neon { 
-      background: var(--neon); color: #000; border: none; padding: 20px; 
-      width: 90%; font-weight: 900; border-radius: 12px; 
-      text-transform: uppercase; font-size: 1.2em;
-      box-shadow: 0 0 30px var(--neon);
-      margin-top: 10px;
-    }
-
-    .opt { 
-      flex: 1; padding: 18px; background: rgba(0,0,0,0.6); border: 1px solid #444; 
-      color: #fff; border-radius: 12px; cursor: pointer; text-align: center; font-weight: bold;
-    }
-    .opt.selected { background: var(--neon); color: #000; border-color: #fff; box-shadow: 0 0 20px var(--neon); }
-
-    input { 
-      width: 80%; padding: 18px; margin: 10px; border-radius: 12px; 
-      border: 2px solid var(--neon); background: rgba(0,0,0,0.9); 
-      color: #fff; font-size: 18px; text-align: center;
-    }
-
-    .footer { 
-      position: fixed; bottom: 0; left: 0; width: 100%; 
-      background: rgba(0,0,0,0.95); padding: 20px; border-top: 3px solid var(--neon);
-      box-sizing: border-box; text-align: center; z-index: 200;
-    }
+    /* Overlay de carga "Perrote" */
+    #loading_overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 10000; flex-direction: column; justify-content: center; align-items: center; }
+    .scanner { width: 250px; height: 3px; background: var(--neon); box-shadow: 0 0 25px var(--neon); animation: scan 1.2s infinite ease-in-out; }
+    @keyframes scan { 0% { transform: translateY(-60px); opacity: 0.3; } 50% { opacity: 1; } 100% { transform: translateY(60px); opacity: 0.3; } }
+    
+    #login_screen { background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.9)), url('https://images.pexels.com/photos/46798/the-ball-stadion-football-the-pitch-46798.jpeg?auto=compress&cs=tinysrgb&w=800'); background-size: cover; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; position: fixed; width: 100%; top: 0; z-index: 1000; }
+    .header { background: rgba(0, 0, 0, 0.95); padding: 25px 15px; text-align: center; border-bottom: 3px solid var(--neon); position: sticky; top: 0; z-index: 100; }
+    
+    #admin_box { background: var(--card-bg); border: 2px solid var(--gold); margin: 20px 15px; padding: 15px; border-radius: 15px; display: none; }
+    .tab-btn { background: #222; color: #aaa; border: none; padding: 10px; flex: 1; font-size: 10px; font-weight: bold; }
+    .tab-btn.active { background: var(--gold); color: #000; }
+    
+    select, .input-master, .input-login { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 8px; background: #000; color: var(--neon); border: 1px solid var(--neon); font-weight: bold; box-sizing: border-box; }
+    .game-card { background: var(--card-bg); padding: 20px; margin: 20px 15px; border-radius: 20px; border: 1px solid var(--neon); }
+    .btn-neon { background: var(--neon); color: #000; border: none; padding: 20px; width: 100%; font-weight: 900; border-radius: 12px; text-transform: uppercase; font-size: 1.2em; box-shadow: 0 0 30px var(--neon); }
+    .opt { flex: 1; padding: 18px; background: rgba(0,0,0,0.6); border: 1px solid #444; color: #fff; border-radius: 12px; text-align: center; font-weight: bold; }
+    .opt.selected { background: var(--neon); color: #000; box-shadow: 0 0 20px var(--neon); border-color: #fff; }
+    .footer { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(0,0,0,0.98); padding: 20px; border-top: 3px solid var(--neon); box-sizing: border-box; text-align: center; z-index: 200; }
   </style>
 </head>
 <body>
 
+  <div id="loading_overlay"><div class="scanner"></div><p style="color:var(--neon); margin-top:30px; letter-spacing:5px;">EJECUTANDO...</p></div>
+
   <div id="login_screen">
-    <h1 style="color:var(--neon); font-size: 4.5em; margin:0; text-shadow: 0 0 25px var(--neon); letter-spacing: 5px;">ELITE</h1>
-    <p style="letter-spacing: 8px; font-size: 10px; margin-bottom: 30px; opacity: 0.8;">SPORTS SYSTEM</p>
-    <input type="text" id="id_user" placeholder="USUARIO ID">
-    <input type="password" id="pass_user" placeholder="PASSWORD">
-    <button class="btn-neon" onclick="entrar()">ENTRAR AL JUEGO</button>
+    <h1 style="color:var(--neon); font-size: 4em; margin:0; text-shadow: 0 0 25px var(--neon);">ELITE</h1>
+    <input type="text" id="id_user" class="input-login" style="width:80%" placeholder="ID USUARIO">
+    <input type="password" id="pass_user" class="input-login" style="width:80%" placeholder="PASSWORD">
+    <button class="btn-neon" onclick="entrar()" style="width:85%;">ENTRAR</button>
   </div>
 
   <div id="main_app" style="display:none;">
     <div class="header">
-      <div id="txt_nombre" style="font-size: 11px; color: var(--neon);">PANTOJA ELITE PLAYER</div>
+      <div id="txt_nombre" style="font-size: 11px; color: var(--neon);">PLAYER</div>
       <div id="txt_saldo" style="font-size: 2.8em; font-weight: 900;">$0.00</div>
     </div>
 
     <div id="admin_box">
-      <p style="color:gold; font-size:12px; font-weight: bold; margin-bottom:10px;">PANEL MASTER WORKER</p>
-      <button onclick="verRanking()" style="background:gold; color:#000; border:none; padding:12px; width:100%; border-radius:10px; font-weight:900; text-transform:uppercase;">CALCULAR GANADORES</button>
+      <div style="display:flex; margin-bottom:15px; border-radius:8px; overflow:hidden;">
+        <button class="tab-btn active" id="btn_tab_1" onclick="switchTab(1)">CRÉDITOS</button>
+        <button class="tab-btn" id="btn_tab_2" onclick="switchTab(2)">NUEVO PLAYER</button>
+      </div>
+
+      <div id="tab_creditos">
+        <select id="select_usuarios"><option value="">CARGANDO...</option></select>
+        <div style="display:flex; gap:10px;">
+          <input type="number" id="amount_credit" class="input-master" style="flex:1" placeholder="CANTIDAD $$">
+          <button onclick="addCredit()" style="background:var(--gold); border:none; border-radius:8px; font-weight:900; padding:0 15px; height:42px;">CARGAR</button>
+        </div>
+      </div>
+
+      <div id="tab_registro" style="display:none;">
+        <input type="text" id="reg_id" class="input-master" placeholder="ID (Ej: 105)">
+        <input type="text" id="reg_nombre" class="input-master" placeholder="NOMBRE COMPLETO">
+        <input type="text" id="reg_pass" class="input-master" placeholder="PASSWORD">
+        <button onclick="crearPlayer()" style="background:var(--neon); color:#000; border:none; width:100%; border-radius:8px; font-weight:900; padding:15px;">GUARDAR PLAYER</button>
+      </div>
+      <button onclick="verRanking()" style="background:transparent; color:var(--gold); border:1px solid var(--gold); padding:8px; width:100%; border-radius:8px; font-size:10px; margin-top:15px;">VER RANKING JORNADA</button>
     </div>
 
-    <h2 id="tit_jornada" style="text-align:center; color:var(--neon); letter-spacing:5px; margin:30px 0;"></h2>
-    
     <div id="contenedor_juegos" style="padding-bottom: 150px;"></div>
-
-    <div class="footer">
-      <button class="btn-neon" onclick="enviar()">CONFIRMAR BET $10 USD</button>
-    </div>
+    <div class="footer"><button class="btn-neon" onclick="enviar()">CONFIRMAR BET $10 USD</button></div>
   </div>
 
 <script>
-  const URL_EXEC = "https://script.google.com/macros/s/AKfycbwXz9wNVsn_BUUzyDx5gs3IV6ClP7t5aSD-yF_6FzDwrXwPGjEWOZKThWqpbA8QeOlI/exec"; 
+  // ¡CAMBIA ESTO POR TU URL DE DESPLIEGUE!
+  const URL_EXEC = "https://script.google.com/macros/s/AKfycbwUzR_llp_RKWvZJxCCcSF0okW12Qux7KuwwFYsT6OWaXNpNxCSma8aMMIfecCp_0Os/exec"; 
   let USER_DATA = {}, JUEGOS = [], PICKS = {};
 
   function entrar() {
     const id = document.getElementById('id_user').value;
     const pass = document.getElementById('pass_user').value;
-    const s = document.createElement('script');
-    s.src = `${URL_EXEC}?action=login&id=${id}&pass=${pass}&callback=loginCb`;
-    window.loginCb = function(res) {
+    mostrarCarga(true);
+    fetchJSONP(`${URL_EXEC}?action=login&id=${id}&pass=${pass}`, function(res) {
+      mostrarCarga(false);
       if(res.success) {
         USER_DATA = res.user;
         document.getElementById('login_screen').style.display = 'none';
         document.getElementById('main_app').style.display = 'block';
-        document.getElementById('txt_nombre').innerText = "PLAYER: " + USER_DATA.nombre;
+        document.getElementById('txt_nombre').innerText = USER_DATA.nivel.toUpperCase() + ": " + USER_DATA.nombre;
         document.getElementById('txt_saldo').innerText = "$" + USER_DATA.saldo;
-        if(USER_DATA.nivel === "Master") document.getElementById('admin_box').style.display = 'block';
+        if(USER_DATA.nivel === "Master") {
+          document.getElementById('admin_box').style.display = 'block';
+          cargarListaUsuarios(); 
+        }
         cargarJuegos();
-      } else { alert("ERROR DE ACCESO"); }
-      document.body.removeChild(s);
-    };
-    document.body.appendChild(s);
+      } else { alert("ACCESO DENEGADO"); }
+    });
+  }
+
+  function crearPlayer() {
+    const nid = document.getElementById('reg_id').value;
+    const nnom = document.getElementById('reg_nombre').value;
+    const npass = document.getElementById('reg_pass').value;
+    if(!nid || !nnom || !npass) return alert("Faltan datos");
+    
+    mostrarCarga(true);
+    // IMPORTANTE: Los nombres de parámetros aquí deben coincidir con tu Código.gs
+    fetchJSONP(`${URL_EXEC}?action=crearUsuario&nuevoId=${nid}&nuevoNombre=${nnom}&nuevoPass=${npass}`, function(res) {
+      mostrarCarga(false);
+      alert(res.msg);
+      if(res.success) {
+        document.getElementById('reg_id').value=""; document.getElementById('reg_nombre').value=""; document.getElementById('reg_pass').value="";
+        cargarListaUsuarios(); 
+      }
+    });
+  }
+
+  function cargarListaUsuarios() {
+    fetchJSONP(`${URL_EXEC}?action=getUsers`, function(usuarios) {
+      const select = document.getElementById('select_usuarios');
+      select.innerHTML = '<option value="">SELECCIONAR USUARIO...</option>';
+      usuarios.forEach(u => {
+        const opt = document.createElement('option');
+        opt.value = u.id;
+        opt.innerText = u.nombre + " (" + u.id + ")";
+        select.appendChild(opt);
+      });
+    });
+  }
+
+  function addCredit() {
+    const target = document.getElementById('select_usuarios').value;
+    const amount = document.getElementById('amount_credit').value;
+    if(!target || !amount) return alert("Selecciona usuario y monto.");
+    mostrarCarga(true);
+    fetchJSONP(`${URL_EXEC}?action=addCredit&idTarget=${target}&amount=${amount}`, function(res) {
+       mostrarCarga(false);
+       alert(res.msg);
+       document.getElementById('amount_credit').value = "";
+       if(target === USER_DATA.id) location.reload();
+    });
   }
 
   function cargarJuegos() {
-    const s = document.createElement('script');
-    s.src = `${URL_EXEC}?action=getGames&callback=gamesCb`;
-    window.gamesCb = function(res) {
+    fetchJSONP(`${URL_EXEC}?action=getGames`, function(res) {
       JUEGOS = res;
-      if(JUEGOS.length > 0) document.getElementById('tit_jornada').innerText = "QUINIELA " + JUEGOS[0].jornada;
+      if(JUEGOS.length > 0) document.getElementById('tit_jornada').innerText = "JORNADA " + JUEGOS[0].jornada;
       const cont = document.getElementById('contenedor_juegos');
       cont.innerHTML = "";
       JUEGOS.forEach((j, i) => {
         const d = document.createElement('div');
         d.className = 'game-card';
-        d.innerHTML = `
-          <div style="text-align:center; color:var(--neon); font-size:11px; margin-bottom:12px;">🕒 ${j.fecha}</div>
-          <div class="teams">
-            <span>${j.local}</span> 
-            <span style="color:var(--neon); font-size:0.6em; font-style:italic;">VS</span> 
-            <span>${j.visita}</span>
-          </div>
-          <div style="text-align:center; font-size:10px; color:#888; margin:15px 0;">🏟️ ${j.estadio}</div>
-          <div style="display:flex; gap:10px;">
-            <div class="opt" onclick="sel(${i},'L',this)">L</div>
-            <div class="opt" onclick="sel(${i},'E',this)">E</div>
-            <div class="opt" onclick="sel(${i},'V',this)">V</div>
+        d.innerHTML = `<div class="teams"><span>${j.local}</span> <span style="color:var(--neon); font-size:0.6em;">VS</span> <span>${j.visita}</span></div>
+          <div style="display:flex; gap:10px; margin-top:15px;">
+            <div class="opt" onclick="sel(${i},'L',this)">L</div><div class="opt" onclick="sel(${i},'E',this)">E</div><div class="opt" onclick="sel(${i},'V',this)">V</div>
           </div>`;
         cont.appendChild(d);
       });
-      document.body.removeChild(s);
-    };
-    document.body.appendChild(s);
+    });
   }
 
   function sel(idx, p, btn) {
+    if (window.navigator.vibrate) window.navigator.vibrate(20);
     btn.parentElement.querySelectorAll('.opt').forEach(b => b.classList.remove('selected'));
     btn.classList.add('selected');
     PICKS[idx] = p;
@@ -182,24 +172,41 @@
 
   function enviar() {
     if(Object.keys(PICKS).length < JUEGOS.length) return alert("Completa la quiniela.");
-    if(!confirm("¿Apostar $10 USD?")) return;
+    mostrarCarga(true);
     const pStr = Object.values(PICKS).join(',');
-    const s = document.createElement('script');
-    s.src = `${URL_EXEC}?action=registrarQuiniela&idUser=${USER_DATA.id}&picks=${pStr}&jornada=${JUEGOS[0].jornada}&callback=resCb`;
-    window.resCb = function(r) { alert(r.msg); location.reload(); };
-    document.body.appendChild(s);
+    fetchJSONP(`${URL_EXEC}?action=registrarQuiniela&idUser=${USER_DATA.id}&picks=${pStr}&jornada=${JUEGOS[0].jornada}`, function(r) {
+      mostrarCarga(false);
+      alert(r.msg); location.reload();
+    });
+  }
+
+  function switchTab(n) {
+    document.getElementById('tab_creditos').style.display = (n === 1) ? 'block' : 'none';
+    document.getElementById('tab_registro').style.display = (n === 2) ? 'block' : 'none';
+    document.getElementById('btn_tab_1').className = (n === 1) ? 'tab-btn active' : 'tab-btn';
+    document.getElementById('btn_tab_2').className = (n === 2) ? 'tab-btn active' : 'tab-btn';
   }
 
   function verRanking() {
-    const s = document.createElement('script');
-    s.src = `${URL_EXEC}?action=verGanadores&jornada=${JUEGOS[0].jornada}&callback=rankCb`;
-    window.rankCb = function(res) {
+    fetchJSONP(`${URL_EXEC}?action=verGanadores&jornada=${JUEGOS[0].jornada}`, function(res) {
       let r = "🏆 RANKING ACTUAL\n\n";
       res.forEach((u, i) => r += `${i+1}º ${u.nombre} - ${u.puntos} pts\n`);
       alert(r);
-      document.body.removeChild(s);
+    });
+  }
+
+  function mostrarCarga(s) { document.getElementById('loading_overlay').style.display = s ? 'flex' : 'none'; }
+
+  function fetchJSONP(url, callback) {
+    const callbackName = 'jsonp_' + Math.round(100000 * Math.random());
+    window[callbackName] = function(data) {
+      delete window[callbackName];
+      document.body.removeChild(script);
+      callback(data);
     };
-    document.body.appendChild(s);
+    const script = document.createElement('script');
+    script.src = url + (url.indexOf('?') >= 0 ? '&' : '?') + 'callback=' + callbackName;
+    document.body.appendChild(script);
   }
 </script>
 </body>
