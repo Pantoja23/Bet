@@ -260,14 +260,15 @@
     if(Object.keys(PICKS).length < JUEGOS.length) return alert("Faltan partidos por seleccionar");
     if(!confirm("¿Confirmar envío de quiniela por $10 USD?")) return;
     
-    const ventanaWhatsApp = window.open("", "_blank");
-    ventanaWhatsApp.document.write("<html><body style='background:#000;color:#00f2ff;display:flex;flex-direction:column;justify-content:center;align-items:center;height:100vh;font-family:sans-serif;'><h2>KINGELAS</h2><p>Generando Ticket Real...</p></body></html>");
-
+    // 1. Mostrar carga y bloquear pantalla para que no piquen dos veces
     mostrarCarga(true);
     const pStr = Object.values(PICKS).join(',');
     
+    // 2. Primero guardamos en la base de datos (Google Sheets)
     fetchJSONP(`${URL_EXEC}?action=registrarQuiniela&idUser=${USER_DATA.id}&picks=${pStr}&jornada=${JUEGOS[0].jornada}`, function(r) {
+      
       if(r.msg.includes("✅")) {
+        // 3. Si el guardado fue exitoso, generamos el ticket
         const transaccion = "KING-" + Math.floor(Math.random() * 900000 + 100000);
         let mensaje = "👑 *TICKET: KINGELAS*%0A";
         mensaje += "🆔 *Ticket:* " + transaccion + "%0A";
@@ -286,13 +287,21 @@
         mensaje += "💰 *Costo:* $10 USD%0A";
         mensaje += "✅ *AUTORIZADO POR EL REINO*";
 
+        // 4. Usamos el protocolo 'whatsapp://' que abre la APP directamente en el cel
+        // Si no funciona, usamos el link universal
         const urlWhatsApp = "https://api.whatsapp.com/send?phone=19152607928&text=" + mensaje;
-        ventanaWhatsApp.location.href = urlWhatsApp;
+        
+        mostrarCarga(false);
+        alert("👑 ¡CONQUISTA REGISTRADA!\nPresiona OK para enviar tu ticket a WhatsApp.");
+        
+        // 5. Esto abre WhatsApp y al regresar el usuario, la app se refresca
+        window.location.href = urlWhatsApp;
+        
+        // Por si acaso no se refresca al volver, forzamos recarga en 3 segundos
+        setTimeout(function(){ location.reload(); }, 3000);
 
-        alert("¡Conquista Registrada! Ticket: " + transaccion);
-        location.reload(); 
       } else {
-        ventanaWhatsApp.close();
+        // Si hubo error de saldo o red
         mostrarCarga(false);
         alert(r.msg);
       }
