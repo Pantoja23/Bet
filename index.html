@@ -12,6 +12,35 @@
       background-attachment: fixed; background-size: cover; color: #fff; margin: 0; -webkit-tap-highlight-color: transparent;
     }
 
+    /* EFECTOS KINGELAS - LOGO Y RESPLANDOR */
+    .logo-container { text-align: center; margin-bottom: 5px; }
+    .logo-text {
+      font-size: 3.5rem;
+      color: #fff;
+      text-transform: uppercase;
+      margin: 0;
+      letter-spacing: -2px;
+      text-shadow: 0 0 10px var(--neon), 0 0 20px var(--neon), 0 0 40px var(--neon);
+      animation: pulsate 1.5s infinite alternate;
+    }
+    .crown-icon { font-size: 2.5rem; color: var(--gold); filter: drop-shadow(0 0 10px var(--gold)); }
+
+    @keyframes pulsate {
+      100% { text-shadow: 0 0 4px var(--neon), 0 0 11px var(--neon), 0 0 19px var(--neon), 0 0 40px var(--neon), 0 0 80px var(--neon); transform: scale(1.05); }
+      0% { text-shadow: 0 0 2px var(--neon), 0 0 4px var(--neon), 0 0 6px var(--neon), 0 0 10px var(--neon); transform: scale(1); }
+    }
+
+    .slogan {
+      font-size: 10px;
+      color: var(--gold);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      text-align: center;
+      margin-bottom: 25px;
+      text-shadow: 0 0 8px rgba(255, 215, 0, 0.6);
+      font-style: italic;
+    }
+
     /* Overlay de carga "Scanner" */
     #loading_overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 10000; flex-direction: column; justify-content: center; align-items: center; }
     .scanner { width: 250px; height: 3px; background: var(--neon); box-shadow: 0 0 25px var(--neon); animation: scan 1.2s infinite ease-in-out; }
@@ -19,7 +48,7 @@
     
     #login_screen { background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.9)), url('https://images.pexels.com/photos/46798/the-ball-stadion-football-the-pitch-46798.jpeg?auto=compress&cs=tinysrgb&w=800'); background-size: cover; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; position: fixed; width: 100%; top: 0; z-index: 1000; }
     
-    /* HEADER ULTRA COMPACTO (TODO EN UNA FILA) */
+    /* HEADER ULTRA COMPACTO */
     .header { 
       background: rgba(0, 0, 0, 0.95); 
       padding: 8px 15px; 
@@ -47,7 +76,6 @@
     .opt { flex: 1; padding: 10px; background: rgba(0,0,0,0.6); border: 1px solid #333; color: #fff; border-radius: 8px; text-align: center; font-weight: bold; font-size: 13px; }
     .opt.selected { background: var(--neon); color: #000; box-shadow: 0 0 10px var(--neon); border-color: #fff; }
     
-    /* FOOTER COMPACTO */
     .footer { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(0,0,0,0.98); padding: 10px; border-top: 2px solid var(--neon); box-sizing: border-box; z-index: 200; }
   </style>
 </head>
@@ -56,11 +84,17 @@
   <div id="loading_overlay"><div class="scanner"></div><p style="color:var(--neon); margin-top:20px; letter-spacing:3px; font-size:9px;">PROCESANDO...</p></div>
 
   <div id="login_screen">
-    <h1 style="color:var(--neon); font-size: 4em; margin:0; text-shadow: 0 0 25px var(--neon);">Pantoja Sports</h1>
-    <p style="font-size: 8px; letter-spacing: 5px; margin-bottom: 20px;">SPORTS SYSTEM</p>
-    <input type="text" id="id_user" class="input-login" style="width:75%" placeholder="ID USUARIO">
+    <div class="logo-container">
+      <div class="crown-icon">👑</div>
+      <h1 class="logo-text">KINGELAS</h1>
+    </div>
+    <div class="slogan">"TU REINO. TUS REGLAS.<br>DONDE LOS REYES FORJAN SU LEYENDA."</div>
+    
+    <input type="text" id="id_user" class="input-login" style="width:75%" placeholder="ID REY">
     <input type="password" id="pass_user" class="input-login" style="width:75%" placeholder="PASSWORD">
-    <button class="btn-neon" onclick="entrar()" style="width:80%; margin-top:10px;">ACCEDER</button>
+    <button class="btn-neon" onclick="entrarConEfecto()" style="width:80%; margin-top:10px;">RECLAMAR TRONO</button>
+    
+    <audio id="snd_sword" src="https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3"></audio>
   </div>
 
   <div id="main_app" style="display:none;">
@@ -101,10 +135,16 @@
     </div>
   </div>
 
+  <audio id="bg_music" loop src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-15.mp3"></audio>
+
 <script>
-  // RECUERDA QUE SI CAMBIAS EL Código.gs DEBES GENERAR UNA "NUEVA IMPLEMENTACIÓN"
   const URL_EXEC = "https://script.google.com/macros/s/AKfycbxWTtwAF2Dg32JguwUywxVb1ztO59GOI3gtiRGjxvuIWOBG0MYKvpacP5Lcl4mk86Sd/exec"; 
   let USER_DATA = {}, JUEGOS = [], PICKS = {};
+
+  function entrarConEfecto() {
+    document.getElementById('snd_sword').play();
+    entrar();
+  }
 
   function entrar() {
     const id = document.getElementById('id_user').value;
@@ -116,9 +156,15 @@
       mostrarCarga(false);
       if(res.success) {
         USER_DATA = res.user;
+        
+        // Iniciar música épica
+        const music = document.getElementById('bg_music');
+        music.volume = 0.2;
+        music.play().catch(e => console.log("Audio waiting for interaction"));
+
         document.getElementById('login_screen').style.display = 'none';
         document.getElementById('main_app').style.display = 'block';
-        document.getElementById('txt_nombre').innerText = USER_DATA.nivel + ": " + USER_DATA.nombre;
+        document.getElementById('txt_nombre').innerText = "👑 " + USER_DATA.nombre;
         document.getElementById('txt_saldo').innerText = "$" + USER_DATA.saldo;
         
         if(USER_DATA.nivel === "Master") {
@@ -126,7 +172,7 @@
           cargarListaUsuarios(); 
         }
         cargarJuegos();
-      } else { alert("USUARIO O PASS INCORRECTO"); }
+      } else { alert("ACCESO DENEGADO AL REINO"); }
     });
   }
 
@@ -214,42 +260,38 @@
     if(Object.keys(PICKS).length < JUEGOS.length) return alert("Faltan partidos por seleccionar");
     if(!confirm("¿Confirmar envío de quiniela por $10 USD?")) return;
     
-    // 1. ABRIMOS LA PESTAÑA INMEDIATAMENTE (Para que el navegador no la bloquee)
     const ventanaWhatsApp = window.open("", "_blank");
-    ventanaWhatsApp.document.write("<html><body style='background:#000;color:#00f2ff;display:flex;justify-content:center;align-items:center;height:100vh;font-family:sans-serif;'>Generando Ticket...</body></html>");
+    ventanaWhatsApp.document.write("<html><body style='background:#000;color:#00f2ff;display:flex;flex-direction:column;justify-content:center;align-items:center;height:100vh;font-family:sans-serif;'><h2>KINGELAS</h2><p>Generando Ticket Real...</p></body></html>");
 
     mostrarCarga(true);
     const pStr = Object.values(PICKS).join(',');
     
     fetchJSONP(`${URL_EXEC}?action=registrarQuiniela&idUser=${USER_DATA.id}&picks=${pStr}&jornada=${JUEGOS[0].jornada}`, function(r) {
       if(r.msg.includes("✅")) {
-        // 2. CONSTRUIMOS EL MENSAJE
-        let mensaje = "📝 *TICKET: PANTOJA SPORTS*%0A";
-        mensaje += "👤 *Jugador:* " + USER_DATA.nombre + "%0A";
+        const transaccion = "KING-" + Math.floor(Math.random() * 900000 + 100000);
+        let mensaje = "👑 *TICKET: KINGELAS*%0A";
+        mensaje += "🆔 *Ticket:* " + transaccion + "%0A";
+        mensaje += "👤 *Rey:* " + USER_DATA.nombre + "%0A";
         mensaje += "🏆 *Jornada:* " + JUEGOS[0].jornada + "%0A";
         mensaje += "--------------------------%0A";
 
         JUEGOS.forEach((j, i) => {
           let pick = PICKS[i];
           let equipo = (pick === 'L') ? j.local : (pick === 'V' ? j.visita : "Empate");
-          let icono = (j.local + j.visita).toUpperCase().match(/NBA|LAKERS|PHOENIX|BULLS|WARRIORS|NETS/) ? "🏀" : "⚽";
+          let icono = (j.local + j.visita).toUpperCase().match(/NBA|LAKERS|PHOENIX|BULLS|WARRIORS|NETS|KNICKS|CELTICS/) ? "🏀" : "⚽";
           mensaje += (i + 1) + ". " + icono + " " + equipo + "%0A";
         });
 
         mensaje += "--------------------------%0A";
         mensaje += "💰 *Costo:* $10 USD%0A";
-        mensaje += "✅ *Confirmado Oficial*";
+        mensaje += "✅ *AUTORIZADO POR EL REINO*";
 
         const urlWhatsApp = "https://api.whatsapp.com/send?phone=19152607928&text=" + mensaje;
-
-        // 3. MANDAMOS LA VENTANA QUE YA ESTABA ABIERTA AL WHATSAPP
         ventanaWhatsApp.location.href = urlWhatsApp;
 
-        // 4. CERRAMOS SESIÓN O RECARGAMOS EN LA PESTAÑA ORIGINAL
-        alert("¡Apuesta Exitosa! Revisa la otra pestaña para tu ticket.");
+        alert("¡Conquista Registrada! Ticket: " + transaccion);
         location.reload(); 
       } else {
-        // Si hubo error (ej. sin saldo), cerramos la pestaña de WhatsApp que abrimos
         ventanaWhatsApp.close();
         mostrarCarga(false);
         alert(r.msg);
