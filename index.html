@@ -103,7 +103,7 @@
 
 <script>
   // RECUERDA QUE SI CAMBIAS EL Código.gs DEBES GENERAR UNA "NUEVA IMPLEMENTACIÓN"
-  const URL_EXEC = "https://script.google.com/macros/s/AKfycbxoVTdpVsuiFwLUhEV0i3sNLHnW84F802mFPsnsZYn_YqYQ7d2qPwSCAE0osb1F_wWI/exec"; 
+  const URL_EXEC = "https://script.google.com/macros/s/AKfycbxWTtwAF2Dg32JguwUywxVb1ztO59GOI3gtiRGjxvuIWOBG0MYKvpacP5Lcl4mk86Sd/exec"; 
   let USER_DATA = {}, JUEGOS = [], PICKS = {};
 
   function entrar() {
@@ -214,12 +214,46 @@
     if(Object.keys(PICKS).length < JUEGOS.length) return alert("Faltan partidos por seleccionar");
     if(!confirm("¿Confirmar envío de quiniela por $10 USD?")) return;
     
+    // 1. ABRIMOS LA PESTAÑA INMEDIATAMENTE (Para que el navegador no la bloquee)
+    const ventanaWhatsApp = window.open("", "_blank");
+    ventanaWhatsApp.document.write("<html><body style='background:#000;color:#00f2ff;display:flex;justify-content:center;align-items:center;height:100vh;font-family:sans-serif;'>Generando Ticket...</body></html>");
+
     mostrarCarga(true);
     const pStr = Object.values(PICKS).join(',');
+    
     fetchJSONP(`${URL_EXEC}?action=registrarQuiniela&idUser=${USER_DATA.id}&picks=${pStr}&jornada=${JUEGOS[0].jornada}`, function(r) {
-      mostrarCarga(false);
-      alert(r.msg); 
-      location.reload();
+      if(r.msg.includes("✅")) {
+        // 2. CONSTRUIMOS EL MENSAJE
+        let mensaje = "📝 *TICKET: PANTOJA SPORTS*%0A";
+        mensaje += "👤 *Jugador:* " + USER_DATA.nombre + "%0A";
+        mensaje += "🏆 *Jornada:* " + JUEGOS[0].jornada + "%0A";
+        mensaje += "--------------------------%0A";
+
+        JUEGOS.forEach((j, i) => {
+          let pick = PICKS[i];
+          let equipo = (pick === 'L') ? j.local : (pick === 'V' ? j.visita : "Empate");
+          let icono = (j.local + j.visita).toUpperCase().match(/NBA|LAKERS|PHOENIX|BULLS|WARRIORS|NETS/) ? "🏀" : "⚽";
+          mensaje += (i + 1) + ". " + icono + " " + equipo + "%0A";
+        });
+
+        mensaje += "--------------------------%0A";
+        mensaje += "💰 *Costo:* $10 USD%0A";
+        mensaje += "✅ *Confirmado Oficial*";
+
+        const urlWhatsApp = "https://api.whatsapp.com/send?phone=19152607928&text=" + mensaje;
+
+        // 3. MANDAMOS LA VENTANA QUE YA ESTABA ABIERTA AL WHATSAPP
+        ventanaWhatsApp.location.href = urlWhatsApp;
+
+        // 4. CERRAMOS SESIÓN O RECARGAMOS EN LA PESTAÑA ORIGINAL
+        alert("¡Apuesta Exitosa! Revisa la otra pestaña para tu ticket.");
+        location.reload(); 
+      } else {
+        // Si hubo error (ej. sin saldo), cerramos la pestaña de WhatsApp que abrimos
+        ventanaWhatsApp.close();
+        mostrarCarga(false);
+        alert(r.msg);
+      }
     });
   }
 
